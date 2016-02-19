@@ -1,0 +1,17 @@
+{
+  "name": "ng-lazy-render",
+  "description": "",
+  "main": "dist/ng-lazy-render.js",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/onemanclapping/ng-lazy-render.git"
+  },
+  "dependencies": {
+    "angular": "1.x"
+  },
+  "keywords": [
+    "angular",
+    "lazy render"
+  ]
+}

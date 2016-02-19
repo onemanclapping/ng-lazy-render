@@ -1,0 +1,33 @@
+{
+  "name": "angular-touch-faster",
+  "version": "0.0.1",
+  "description": "Set of directives to accelerate angular mobile apps even further",
+  "author": "Andre Duarte <onemanclapping@gmail.com>",
+  "main": "./dist/angular-touch-faster.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onemanclapping/angular-touch-faster"
+  },
+  "bugs": {
+    "url": "https://github.com/onemanclapping/angular-touch-faster/issues"
+  },
+  "keywords": [
+    "angular",
+    "angular-touch"
+  ],
+  "dependencies": {
+    "angular": "1.4.x",
+    "angular-touch": "1.4.x"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.4.8",
+    "del": "2.2.0",
+    "gulp": "3.9.0",
+    "gulp-concat": "2.6.0",
+    "karma": "0.13.15",
+    "karma-jasmine": "0.3.6",
+    "karma-coverage": "0.5.3",
+    "karma-phantomjs2-launcher": "0.3.2",
+    "karma-spec-reporter": "0.0.23"
+  }
+}
