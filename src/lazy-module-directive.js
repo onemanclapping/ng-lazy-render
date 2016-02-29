@@ -6,6 +6,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
     'inViewDirective',
     function ($animate, $compile, $rootScope, $timeout, inViewDirective) {
         'use strict';
+        console.log('oix')
 
         return {
             priority: 500,

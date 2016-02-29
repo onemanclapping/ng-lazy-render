@@ -13,7 +13,7 @@ gulp.task('clean', function() {
 
 gulp.task('scripts', ['clean'], function() {
   return gulp.src(paths.scripts)
-    .pipe(concat('ng-lazy-load.js'))
+    .pipe(concat('ng-lazy-render.js'))
     .pipe(gulp.dest('dist'));
 });
 

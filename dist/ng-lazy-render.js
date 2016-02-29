@@ -2,7 +2,7 @@
  * Module declaration
  */
 angular.module('ngLazyRender', []);
-angular.module('ngLazyRender').directive('ngLazyModule', [
+angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
     '$compile',
     '$rootScope',
@@ -17,13 +17,13 @@ angular.module('ngLazyRender').directive('ngLazyModule', [
             transclude: 'element',
             link: function ($scope, $element, $attr, ctrl, $transclude) {
                 var visible = true;
-                var el = angular.element('<div class="cenas" style="position:relative;height:' + $attr.lazyTemplate + 'px"><div class="spinner center"></div></div>')
+                var el = angular.element('<div class="cenas" style="position:relative;height:' + $attr.lazyModule + 'px"><div class="spinner center"></div></div>')
                 var isolateScope = $rootScope.$new();
 
                 isolateScope.update = function (inView) {
                     // return;
                     if (inView) {
-                        // $timeout(function () {
+                        $timeout(function () {
                             
                         
                         var newEl = $transclude(function(clone, newScope) {
@@ -35,7 +35,7 @@ angular.module('ngLazyRender').directive('ngLazyModule', [
                             $animate.enter(clone, $element.parent(), $element);
                         });
                         console.log('loaded', newEl);
-                        // }, 1000);
+                        }, 1000);
                     }
                 };
 
