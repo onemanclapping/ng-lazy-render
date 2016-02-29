@@ -1,23 +1,22 @@
 {
   "name": "angular-touch-faster",
   "version": "0.0.1",
-  "description": "Set of directives to accelerate angular mobile apps even further",
+  "description": "",
   "author": "Andre Duarte <onemanclapping@gmail.com>",
-  "main": "./dist/angular-touch-faster.js",
+  "main": "./dist/ng-lazy-render.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onemanclapping/angular-touch-faster"
+    "url": "https://github.com/onemanclapping/ng-lazy-render"
   },
   "bugs": {
-    "url": "https://github.com/onemanclapping/angular-touch-faster/issues"
+    "url": "https://github.com/onemanclapping/ng-lazy-render/issues"
   },
   "keywords": [
     "angular",
-    "angular-touch"
+    "lazy render"
   ],
   "dependencies": {
-    "angular": "1.4.x",
-    "angular-touch": "1.4.x"
+    "angular": "1.x"
   },
   "devDependencies": {
     "angular-mocks": "1.4.8",
