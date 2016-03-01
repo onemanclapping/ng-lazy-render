@@ -6,41 +6,38 @@ angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
     '$compile',
     '$rootScope',
+    '$templateCache',
     '$timeout',
     'inViewDirective',
-    function ($animate, $compile, $rootScope, $timeout, inViewDirective) {
+    function ($animate, $compile, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
+        console.log('oix')
 
         return {
             priority: 500,
             terminal: true,
             transclude: 'element',
             link: function ($scope, $element, $attr, ctrl, $transclude) {
-                var visible = true;
-                var el = angular.element('<div class="cenas" style="position:relative;height:' + $attr.lazyModule + 'px"><div class="spinner center"></div></div>')
+                var el = angular.element($templateCache.get($attr.lazyModule));
                 var isolateScope = $rootScope.$new();
 
                 isolateScope.update = function (inView) {
-                    // return;
                     if (inView) {
-                        $timeout(function () {
-                            
-                        
-                        var newEl = $transclude(function(clone, newScope) {
+                        isolateScope.$destroy();
+                        isolateScope = null;
+
+                        // $timeout(function () {
+
+                        $transclude(function (clone) {
+                            $animate.enter(clone, $element.parent(), $element);
                             $animate.leave(el);
                             el = null;
-                            isolateScope.$destroy();
-                            isolateScope = null;
-                            
-                            $animate.enter(clone, $element.parent(), $element);
                         });
-                        console.log('loaded', newEl);
-                        }, 1000);
+                        // }, 1000);
                     }
                 };
 
                 $animate.enter(el, $element.parent(), $element);
-                
                 $compile(el)(isolateScope);
 
                 $timeout(function () {
@@ -49,5 +46,5 @@ angular.module('ngLazyRender').directive('lazyModule', [
                     });
                 }, 1000);
             }
-        }
+        };
     }]);
