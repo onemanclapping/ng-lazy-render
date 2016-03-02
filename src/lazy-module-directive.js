@@ -1,11 +1,12 @@
 angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
     '$compile',
+    '$parse',
     '$rootScope',
     '$templateCache',
     '$timeout',
     'inViewDirective',
-    function ($animate, $compile, $rootScope, $templateCache, $timeout, inViewDirective) {
+    function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
         console.log('oix')
 
@@ -14,11 +15,20 @@ angular.module('ngLazyRender').directive('lazyModule', [
             terminal: true,
             transclude: 'element',
             link: function ($scope, $element, $attr, ctrl, $transclude) {
+                if ($parse($attr.lazyIf)($scope) === false) {
+                    console.log('skip');
+                    $transclude(function (clone) {
+                        $animate.enter(clone, $element.parent(), $element);
+                    });
+                    return;
+                }
+
                 var el = angular.element($templateCache.get($attr.lazyModule));
                 var isolateScope = $rootScope.$new();
 
                 isolateScope.update = function (inView) {
                     if (inView) {
+                        console.log('rendering');
                         isolateScope.$destroy();
                         isolateScope = null;
 
@@ -40,7 +50,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
                     inViewDirective[0].compile()(isolateScope, el, {
                         inView: "update($inview)"
                     });
-                }, 1000);
+                }, 100);
             }
         };
     }]);
