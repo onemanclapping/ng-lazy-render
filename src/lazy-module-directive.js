@@ -8,7 +8,6 @@ angular.module('ngLazyRender').directive('lazyModule', [
     'inViewDirective',
     function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
-        console.log('oix')
 
         return {
             priority: 500,
@@ -32,14 +31,11 @@ angular.module('ngLazyRender').directive('lazyModule', [
                         isolateScope.$destroy();
                         isolateScope = null;
 
-                        // $timeout(function () {
-
                         $transclude(function (clone) {
                             $animate.enter(clone, $element.parent(), $element);
                             $animate.leave(el);
                             el = null;
                         });
-                        // }, 1000);
                     }
                 };
 
