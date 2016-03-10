@@ -1,8 +1,8 @@
 {
-  "name": "angular-touch-faster",
+  "name": "ng-lazy-render",
   "version": "0.0.1",
   "description": "",
-  "author": "Andre Duarte <onemanclapping@gmail.com>",
+  "contributors": ["Andre Duarte <onemanclapping@gmail.com>", "Joao Pereira <joaomlap@gmail.com>"],
   "main": "./dist/ng-lazy-render.js",
   "repository": {
     "type": "git",
