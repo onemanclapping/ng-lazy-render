@@ -1,7 +1,7 @@
 /**
  * Module declaration
  */
-angular.module('ngLazyRender', []);
+angular.module('ngLazyRender', ['angular-inview']);
 angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
     '$compile',
@@ -12,7 +12,6 @@ angular.module('ngLazyRender').directive('lazyModule', [
     'inViewDirective',
     function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
-        console.log('oix')
 
         return {
             priority: 500,
@@ -20,7 +19,6 @@ angular.module('ngLazyRender').directive('lazyModule', [
             transclude: 'element',
             link: function ($scope, $element, $attr, ctrl, $transclude) {
                 if ($parse($attr.lazyIf)($scope) === false) {
-                    console.log('skip');
                     $transclude(function (clone) {
                         $animate.enter(clone, $element.parent(), $element);
                     });
@@ -32,18 +30,14 @@ angular.module('ngLazyRender').directive('lazyModule', [
 
                 isolateScope.update = function (inView) {
                     if (inView) {
-                        console.log('rendering');
                         isolateScope.$destroy();
                         isolateScope = null;
-
-                        // $timeout(function () {
 
                         $transclude(function (clone) {
                             $animate.enter(clone, $element.parent(), $element);
                             $animate.leave(el);
                             el = null;
                         });
-                        // }, 1000);
                     }
                 };
 
@@ -59,10 +53,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
         };
     }]);
 angular.module('ngLazyRender').directive('lazyRepeater', [
-    '$animate',
-    '$compile',
-    '$rootScope',
-    function ($animate, $compile, $rootScope) {
+    function () {
         'use strict';
 
         return {
@@ -70,9 +61,7 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
             priority: 2000,
 
             compile: function (tElement, tAttrs) {
-                //delete tAttrs.lazyRepeater;
                 var trackByIndex = tAttrs.ngRepeat.indexOf('track by');
-                // var bufferIndex = 
 
                 if (trackByIndex === -1) {
                     tAttrs.ngRepeat += "| limitTo: getLazyLimit()";
@@ -81,24 +70,20 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                         "| limitTo: getLazyLimit() " + tAttrs.ngRepeat.substr(trackByIndex);
                 }
 
-                var rabo = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1];
+                var bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1];
 
                 tElement.after('<div in-view="$inview && increaseLimit()"></div>');
 
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
-
-                    var maxLimit = $scope.$eval(rabo).length;
+                    var bufferLength = $scope.$eval(bufferProp).length;
 
                     $scope.getLazyLimit = function () {
                         return limit;
                     };
 
-                    $scope.increaseLimit = function (i) {
-                        console.log(i);
-                        limit = Math.min(limit * 2, maxLimit);
-
-                        console.log('now', limit)
+                    $scope.increaseLimit = function () {
+                        limit = Math.min(limit * 2, bufferLength);
                     };
                 };
             }

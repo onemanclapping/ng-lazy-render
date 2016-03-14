@@ -8,7 +8,6 @@ angular.module('ngLazyRender').directive('lazyModule', [
     'inViewDirective',
     function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
-        console.log('oix')
 
         return {
             priority: 500,
@@ -16,7 +15,6 @@ angular.module('ngLazyRender').directive('lazyModule', [
             transclude: 'element',
             link: function ($scope, $element, $attr, ctrl, $transclude) {
                 if ($parse($attr.lazyIf)($scope) === false) {
-                    console.log('skip');
                     $transclude(function (clone) {
                         $animate.enter(clone, $element.parent(), $element);
                     });
@@ -28,18 +26,14 @@ angular.module('ngLazyRender').directive('lazyModule', [
 
                 isolateScope.update = function (inView) {
                     if (inView) {
-                        console.log('rendering');
                         isolateScope.$destroy();
                         isolateScope = null;
-
-                        // $timeout(function () {
 
                         $transclude(function (clone) {
                             $animate.enter(clone, $element.parent(), $element);
                             $animate.leave(el);
                             el = null;
                         });
-                        // }, 1000);
                     }
                 };
 
