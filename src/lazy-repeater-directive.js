@@ -1,5 +1,10 @@
 angular.module('ngLazyRender').directive('lazyRepeater', [
-    function () {
+    '$animate',
+    '$compile',
+    '$rootScope',
+    '$templateCache',
+    '$timeout',
+    function ($animate, $compile, $rootScope, $templateCache, $timeout) {
         'use strict';
 
         return {
@@ -18,18 +23,35 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                 var bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1];
 
-                tElement.after('<div in-view="$inview && increaseLimit()"></div>');
-
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
                     var bufferLength = $scope.$eval(bufferProp).length;
+                    var placeholder;
+                    var placeholderEl;
+                    var isolateScope;
+
+                    placeholder = attrs.lazyPlaceholder ?
+                            $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
+                    placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
+                        '</div>');
+
+                    isolateScope = $rootScope.$new();
+                    isolateScope.increaseLimit = function () {
+                        limit = Math.min(limit * 2, bufferLength);
+
+                        if (limit === bufferLength) {
+                            $timeout(function () {
+                                isolateScope.$destroy();
+                                $animate.leave(placeholderEl);
+                            }, 0);
+                        }
+                    };
+
+                    $animate.enter(placeholderEl, el.parent(), el);
+                    $compile(placeholderEl)(isolateScope);
 
                     $scope.getLazyLimit = function () {
                         return limit;
-                    };
-
-                    $scope.increaseLimit = function () {
-                        limit = Math.min(limit * 2, bufferLength);
                     };
                 };
             }
