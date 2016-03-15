@@ -1,5 +1,9 @@
 angular.module('ngLazyRender').directive('lazyRepeater', [
-    function () {
+    '$animate',
+    '$rootScope',
+    '$templateCache',
+    '$timeout',
+    function ($animate, $rootScope, $templateCache, $timeout) {
         'use strict';
 
         return {
@@ -18,18 +22,33 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                 var bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1];
 
-                tElement.after('<div in-view="$inview && increaseLimit()"></div>');
-
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
                     var bufferLength = $scope.$eval(bufferProp).length;
+                    var template;
+                    var templateEl;
+                    var isolateScope;
+
+                    template = attrs.lazyTemplate ? $templateCache.get(attrs.lazyTemplate) || '' : '';
+                    templateEl = angular.element('<div in-view="$inview && increaseLimit()">' + template + '</div>');
+
+                    isolateScope = $rootScope.$new();
+                    isolateScope.increaseLimit = function () {
+                        limit = Math.min(limit * 2, bufferLength);
+
+                        if (limit === bufferLength) {
+                            $timeout(function () {
+                                isolateScope.$destroy();
+                                $animate.leave(templateEl);
+                            }, 0);
+                        }
+                    };
+
+                    $animate.enter(templateEl, el.parent(), el);
+                    $compile(templateEl)(isolateScope);
 
                     $scope.getLazyLimit = function () {
                         return limit;
-                    };
-
-                    $scope.increaseLimit = function () {
-                        limit = Math.min(limit * 2, bufferLength);
                     };
                 };
             }
