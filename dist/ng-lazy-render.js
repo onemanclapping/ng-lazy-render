@@ -54,10 +54,11 @@ angular.module('ngLazyRender').directive('lazyModule', [
     }]);
 angular.module('ngLazyRender').directive('lazyRepeater', [
     '$animate',
+    '$compile',
     '$rootScope',
     '$templateCache',
     '$timeout',
-    function ($animate, $rootScope, $templateCache, $timeout) {
+    function ($animate, $compile, $rootScope, $templateCache, $timeout) {
         'use strict';
 
         return {
@@ -83,7 +84,7 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                     var templateEl;
                     var isolateScope;
 
-                    template = attrs.lazyTemplate ? $templateCache.get(attrs.lazyTemplate) || '' : '';
+                    template = attrs.lazyTemplate ? $templateCache.get(attrs.lazyTemplate) || attrs.lazyTemplate : '';
                     templateEl = angular.element('<div in-view="$inview && increaseLimit()">' + template + '</div>');
 
                     isolateScope = $rootScope.$new();
