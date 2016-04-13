@@ -4,8 +4,8 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     files: [
       'node_modules/angular/angular.js',
+      'node_modules/angular-inview/angular-inview.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'node_modules/angular-touch/angular-touch.js',
       'src/module.js',
       'src/**/*.js',
       'tests/**/*.js'
