@@ -1,3 +1,15 @@
+/**
+ * Use this directive as an attribute if you want a repeater (ng-repeat) to grow as the user scrolls down.
+ * 
+ * Attributes:
+ * - lazyRepeater: number of initially shown items. This number is doubled every time the user sees the end of the list.
+ * - lazyTemplate: template (or templateUrl) to be shown at the end of the list.
+ *
+ * Example:
+ * <my-module lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
+ *  <!-- lots of code -->
+ * </my-module>
+ */
 angular.module('ngLazyRender').directive('lazyRepeater', [
     '$animate',
     '$compile',
