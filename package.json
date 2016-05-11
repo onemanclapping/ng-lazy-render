@@ -1,6 +1,6 @@
 {
   "name": "ng-lazy-render",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "",
   "contributors": ["Andre Duarte <onemanclapping@gmail.com>", "Joao Pereira <joaomlap@gmail.com>"],
   "main": "./dist/ng-lazy-render.js",

@@ -1,4 +1,4 @@
-# ng-lazy-load
+# ng-lazy-render
 
 A set of directives to help using lazy-rendering techniques easily.
 
