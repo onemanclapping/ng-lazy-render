@@ -17,7 +17,7 @@ describe('lazyRepeater directive', function () {
     });
 
     it('should increase the number of shown elements of a repeater as we see the last one', function () {
-        $templateCache.put('templateUrl', '<placeholder></placeholder>')
+        $templateCache.put('templateUrl', '<placeholder></placeholder>');
 
         var initialScope = $rootScope.$new();
         initialScope.data = [];
@@ -30,7 +30,7 @@ describe('lazyRepeater directive', function () {
         }
 
         var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="10" lazy-placeholder="templateUrl">{{obj.data}}</li></ul>')(initialScope);
-        $rootScope.$apply()
+        $rootScope.$apply();
 
         // After compiling the directive we should only see 10 elements
         expect(el.find('li').length).toBe(10);
@@ -56,4 +56,28 @@ describe('lazyRepeater directive', function () {
         $timeout.flush();
         expect(el.find('placeholder').length).toBe(0);
     });
+
+    it('should not render the placeholder when the object length is less then the lazy-repeater parameter', function () {
+        $templateCache.put('templateUrl', '<placeholder></placeholder>');
+
+        var initialScope = $rootScope.$new();
+        initialScope.data = [];
+
+        for (var i = 0; i < 8; i += 1) {
+            initialScope.data.push({
+                index: i,
+                data: 'such data'
+            });
+        }
+
+        var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="10" lazy-placeholder="templateUrl">{{obj.data}}</li></ul>')(initialScope);
+        $rootScope.$apply();
+
+        // After compiling the directive we should see all the 8 elements
+        expect(el.find('li').length).toBe(8);
+        // The placeholder doesn't exist
+        expect(el.find('placeholder').length).toBe(0);
+        
+    });
+
 })
