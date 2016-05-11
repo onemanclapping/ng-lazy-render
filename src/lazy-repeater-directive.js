@@ -41,8 +41,7 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                     var placeholder;
                     var placeholderEl;
                     var isolateScope;
-                    console.log()
-                    if (limit < bufferLength){
+                    if (limit < bufferLength) {
                         placeholder = attrs.lazyPlaceholder ?
                                 $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
                         placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
