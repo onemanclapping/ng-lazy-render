@@ -41,30 +41,32 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                     var placeholder;
                     var placeholderEl;
                     var isolateScope;
+                    console.log()
+                    if (limit < bufferLength){
+                        placeholder = attrs.lazyPlaceholder ?
+                                $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
+                        placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
+                            '</div>');
 
-                    placeholder = attrs.lazyPlaceholder ?
-                            $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
-                    placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
-                        '</div>');
+                        isolateScope = $rootScope.$new();
+                        isolateScope.increaseLimit = function () {
+                            limit = Math.min(limit * 2, bufferLength);
 
-                    isolateScope = $rootScope.$new();
-                    isolateScope.increaseLimit = function () {
-                        limit = Math.min(limit * 2, bufferLength);
+                            if (limit === bufferLength) {
+                                $timeout(function () {
+                                    isolateScope.$destroy();
+                                    $animate.leave(placeholderEl);
+                                }, 0);
+                            }
+                        };
 
-                        if (limit === bufferLength) {
-                            $timeout(function () {
-                                isolateScope.$destroy();
-                                $animate.leave(placeholderEl);
-                            }, 0);
-                        }
-                    };
+                        $animate.enter(placeholderEl, el.parent(), el);
+                        $compile(placeholderEl)(isolateScope);
 
-                    $animate.enter(placeholderEl, el.parent(), el);
-                    $compile(placeholderEl)(isolateScope);
-
-                    $scope.getLazyLimit = function () {
-                        return limit;
-                    };
+                        $scope.getLazyLimit = function () {
+                            return limit;
+                        };
+                    }
                 };
             }
         };
