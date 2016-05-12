@@ -54,6 +54,11 @@ angular.module('ngLazyRender').directive('lazyModule', [
                         $animate.enter(clone, $element.parent(), $element);
                         $animate.leave(el);
                         el = null;
+                        // This triggers inview until all the element in the viewport are visible
+                        $timeout(function () {
+                            angular.element(window).triggerHandler('checkInView');
+                        }, 0);
+
                     });
                 };
 

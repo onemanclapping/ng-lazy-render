@@ -80,4 +80,83 @@ describe('lazyRepeater directive', function () {
         
     });
 
+    it('should show all the elements when lazy-if parameter is false', function () {
+        $templateCache.put('templateUrl', '<placeholder></placeholder>');
+
+        var initialScope = $rootScope.$new();
+        initialScope.data = [];
+
+        for (var i = 0; i < 10; i += 1) {
+            initialScope.data.push({
+                index: i,
+                data: 'such data'
+            });
+        }
+
+        var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="2" lazy-placeholder="templateUrl" lazy-if="false">{{obj.data}}</li></ul>')(initialScope);
+        $rootScope.$apply();
+
+        // After compiling the directive we should see all the 8 elements
+        expect(el.find('li').length).toBe(10);
+        // The placeholder doesn't exist
+        expect(el.find('placeholder').length).toBe(0);
+
+    });
+
+    it('should render the placeholder when lazy-if parameter is true', function () {
+        $templateCache.put('templateUrl', '<placeholder></placeholder>');
+
+        var initialScope = $rootScope.$new();
+        initialScope.data = [];
+
+        for (var i = 0; i < 30; i += 1) {
+            initialScope.data.push({
+                index: i,
+                data: 'such data'
+            });
+        }
+
+        var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="5" lazy-placeholder="templateUrl" lazy-if="true">{{obj.data}}</li></ul>')(initialScope);
+        $rootScope.$apply();
+
+        // After compiling the directive we should see all the 8 elements
+        expect(el.find('li').length).toBe(5);
+        // The placeholder doesn't exist
+        expect(el.find('placeholder').length).toBe(1);
+
+    });
+
+    it('Should trigger checkInView', function () {
+        $templateCache.put('templateUrl', '<placeholder></placeholder>');
+
+        var initialScope = $rootScope.$new();
+        var triggerHandler = jasmine.createSpy();
+
+        initialScope.data = [];
+        angular.element(window).bind('checkInView', triggerHandler);
+
+        for (var i = 0; i < 30; i += 1) {
+            initialScope.data.push({
+                index: i,
+                data: 'such data'
+            });
+        }
+
+        var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="5" lazy-placeholder="templateUrl" lazy-if="true">{{obj.data}}</li></ul>')(initialScope);
+
+        el.find('placeholder').scope().increaseLimit();
+
+        expect(triggerHandler).not.toHaveBeenCalled();
+        $rootScope.$apply();
+        $timeout.flush();
+
+        expect(triggerHandler).toHaveBeenCalled();
+
+        // After compiling the directive we should see all the 20 elements
+        expect(el.find('li').length).toBe(20);
+        // The placeholder doesn't exist
+        expect(el.find('placeholder').length).toBe(1);
+
+    });
+
 })
