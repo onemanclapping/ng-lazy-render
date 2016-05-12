@@ -58,6 +58,11 @@ angular.module('ngLazyRender').directive('lazyModule', [
                         $animate.enter(clone, $element.parent(), $element);
                         $animate.leave(el);
                         el = null;
+                        // This triggers inview until all the element in the viewport are visible
+                        $timeout(function () {
+                            angular.element(window).triggerHandler('checkInView');
+                        }, 0);
+
                     });
                 };
 
@@ -84,19 +89,27 @@ angular.module('ngLazyRender').directive('lazyModule', [
  * Attributes:
  * - lazyRepeater: number of initially shown items. This number is doubled every time the user sees the end of the list.
  * - lazyTemplate: template (or templateUrl) to be shown at the end of the list.
+ * - lazyIf: use an angular expression here to set a condition on whether you want this directive to
+ *           take action or be ignored.
  *
  * Example:
- * <my-module lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
- *  <!-- lots of code -->
- * </my-module>
+ * <ul>
+ *     <li ng-repeat="obj in data track by obj.index" 
+ *      lazy-repeater="10"
+ *      lazy-placeholder="templateUrl"
+ *      lazy-if="ctrl.acceleratePageLoad">
+ *          {{obj.data}}
+ *     </li>
+ * </ul>
  */
 angular.module('ngLazyRender').directive('lazyRepeater', [
     '$animate',
     '$compile',
+    '$parse',
     '$rootScope',
     '$templateCache',
     '$timeout',
-    function ($animate, $compile, $rootScope, $templateCache, $timeout) {
+    function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout) {
         'use strict';
 
         return {
@@ -121,7 +134,9 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                     var placeholder;
                     var placeholderEl;
                     var isolateScope;
-                    if (limit < bufferLength) {
+                    // Only apply lazyRepeater if the threshold is smaller then the number of items and if the
+                    // parameter lazy-if is true
+                    if (limit < bufferLength && $parse(attrs.lazyIf)($scope) !== false) {
                         placeholder = attrs.lazyPlaceholder ?
                                 $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
                         placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
@@ -130,7 +145,10 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                         isolateScope = $rootScope.$new();
                         isolateScope.increaseLimit = function () {
                             limit = Math.min(limit * 2, bufferLength);
-
+                            // This triggers inview until all the element in the viewport are visible
+                            $timeout(function () {
+                                angular.element(window).triggerHandler('checkInView');
+                            }, 0);
                             if (limit === bufferLength) {
                                 $timeout(function () {
                                     isolateScope.$destroy();
