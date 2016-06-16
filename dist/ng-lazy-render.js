@@ -5,7 +5,7 @@ angular.module('ngLazyRender', ['angular-inview']);
 /**
  * Use this directive as an attribute if you want to delay the rendering of a module until visible
  * in the viewport.
- * 
+ *
  * Attributes:
  * - lazyModule: templateUrl of a placeholder to render while the module is not visible or while being
  *               rendered.
@@ -49,6 +49,11 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 // This will destroy the scope of the placeholder with inView and replace it with
                 // the actual transcluded content.
                 isolateScope.update = function () {
+                    // If the function is called after the scope is destroyed (more than once),
+                    // we should do nothing.
+                    if (isolateScope === null) {
+                        return;
+                    }
                     // It is important to destroy the old scope or we'll get unwanted calls from
                     // the inView directive.
                     isolateScope.$destroy();
@@ -83,6 +88,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
             }
         };
     }]);
+
 /**
  * Use this directive as an attribute if you want a repeater (ng-repeat) to grow as the user scrolls down.
  * 
