@@ -1,6 +1,6 @@
 # 0.2.1
 ### Bug Fixes
-Fix situation where extreme scolling throws an error.
+Fix situation where extreme scrolling throws an error.
 
 # 0.2.0
 ### Bug Fixes
