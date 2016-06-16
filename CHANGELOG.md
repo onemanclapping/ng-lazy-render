@@ -1,3 +1,7 @@
+# 0.2.1
+### Bug Fixes
+Fix situation where extreme scolling throws an error.
+
 # 0.2.0
 ### Bug Fixes
 Fix lazyRepeater and lazyModule to automatic trigger inView until all the elements in the viewPort are visible.
