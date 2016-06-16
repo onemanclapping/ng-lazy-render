@@ -49,11 +49,13 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 // This will destroy the scope of the placeholder with inView and replace it with
                 // the actual transcluded content.
                 isolateScope.update = function () {
-                    // It is important to destroy the old scope or we'll get unwanted calls from
-                    // the inView directive.
-                    if (!isolateScope) {
+                    // If the function is called after the scope is destroyed (more than once),
+                    // we should do nothing.
+                    if (isolateScope === null) {
                         return;
                     }
+                    // It is important to destroy the old scope or we'll get unwanted calls from
+                    // the inView directive.
                     isolateScope.$destroy();
                     isolateScope = null;
 
