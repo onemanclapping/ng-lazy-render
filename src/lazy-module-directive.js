@@ -1,7 +1,7 @@
 /**
  * Use this directive as an attribute if you want to delay the rendering of a module until visible
  * in the viewport.
- * 
+ *
  * Attributes:
  * - lazyModule: templateUrl of a placeholder to render while the module is not visible or while being
  *               rendered.
@@ -47,6 +47,9 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 isolateScope.update = function () {
                     // It is important to destroy the old scope or we'll get unwanted calls from
                     // the inView directive.
+                    if (!isolateScope) {
+                        return;
+                    }
                     isolateScope.$destroy();
                     isolateScope = null;
 
