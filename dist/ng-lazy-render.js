@@ -21,11 +21,12 @@ angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
     '$compile',
     '$parse',
+    '$q',
     '$rootScope',
     '$templateCache',
     '$timeout',
     'inViewDirective',
-    function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout, inViewDirective) {
+    function ($animate, $compile, $parse, $q, $rootScope, $templateCache, $timeout, inViewDirective) {
         'use strict';
 
         return {
@@ -60,31 +61,24 @@ angular.module('ngLazyRender').directive('lazyModule', [
                     isolateScope = null;
 
                     $transclude(function (clone) {
-                        $animate.enter(clone, $element.parent(), $element);
-                        $animate.leave(el);
-                        el = null;
-                        // This triggers inview until all the element in the viewport are visible
-                        $timeout(function () {
-                            angular.element(window).triggerHandler('checkInView');
-                        }, 0);
+                        var enterPromise = $animate.enter(clone, $element.parent(), $element);
+                        var leavePromise = $animate.leave(el);
 
+                        $q.all([enterPromise, leavePromise]).then(function () {
+                            el = null;
+
+                            // This triggers inview again to make sure everything is checked again
+                            angular.element(window).triggerHandler('checkInView');
+                        });
                     });
                 };
 
-                $animate.enter(el, $element.parent(), $element);
-                $compile(el)(isolateScope);
-
-                // The number 100 here is a bit magic. We need to give the app some time to expand
-                // other directives in the page before we detect if our module is in the viewport.
-                // Postponing this to the next digest cycle should be enough but for some reason
-                // it's not enough on some slower environments. 100ms seems to be enough.
-                //
-                // TODO: investigate why this happens
-                $timeout(function () {
+                $animate.enter(el, $element.parent(), $element).then(function () {
+                    $compile(el)(isolateScope);
                     inViewDirective[0].compile()(isolateScope, el, {
                         inView: "$inview && update()"
                     });
-                }, 100);
+                });
             }
         };
     }]);
