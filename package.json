@@ -1,7 +1,7 @@
 {
   "name": "ng-lazy-render",
-  "version": "0.2.0",
-  "description": "",
+  "version": "0.2.2",
+  "description": "A set of directives to postpone your angular application from rendering elements outside the viewport.",
   "contributors": ["Andre Duarte <onemanclapping@gmail.com>", "Joao Pereira <joaomlap@gmail.com>"],
   "main": "./dist/ng-lazy-render.js",
   "repository": {
@@ -16,10 +16,10 @@
     "lazy render"
   ],
   "dependencies": {
-    "angular": "1.x"
+    "angular": "1.x",
+    "angular-inview": "1.5.7"
   },
   "devDependencies": {
-    "angular-inview": "1.5.7",
     "angular-mocks": "1.4.8",
     "del": "2.2.0",
     "gulp": "3.9.0",

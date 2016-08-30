@@ -1,3 +1,7 @@
+# 0.2.2
+### Bug Fixes
+Fix magic numbers and hopefully fix weird scenarios where checkInView event was not trigerred correctly.
+
 # 0.2.1
 ### Bug Fixes
 Fix situation where extreme scrolling throws an error.

@@ -9,9 +9,9 @@
  *           take action or be ignored.
  *
  * Example:
- * <my-module lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
+ * <any lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
  *  <!-- lots of code -->
- * </my-module>
+ * </any>
  */
 angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
