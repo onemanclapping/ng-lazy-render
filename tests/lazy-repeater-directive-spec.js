@@ -1,14 +1,18 @@
 describe('lazyRepeater directive', function () {
-    var $compile, $rootScope, $templateCache, $timeout;
+    var $animate, $compile, $rootScope, $templateCache, $timeout;
 
     beforeEach(function () {
         module('ngLazyRender');
+        module('ngAnimateMock');
 
-        inject(['$compile',
+        inject([
+            '$animate',
+            '$compile',
             '$rootScope',
             '$templateCache',
             '$timeout',
-            function (_$compile_, _$rootScope_, _$templateCache_, _$timeout_) {
+            function (_$animate_, _$compile_, _$rootScope_, _$templateCache_, _$timeout_) {
+                $animate = _$animate_;
                 $compile = _$compile_;
                 $rootScope = _$rootScope_;
                 $templateCache = _$templateCache_;
@@ -53,7 +57,6 @@ describe('lazyRepeater directive', function () {
         // We should now be able to see all elements (30)
         expect(el.find('li').length).toBe(30);
         // And, on the next digest cycle, no placeholder
-        $timeout.flush();
         expect(el.find('placeholder').length).toBe(0);
     });
 
@@ -143,20 +146,15 @@ describe('lazyRepeater directive', function () {
         }
 
         var el = $compile('<ul><li ng-repeat="obj in data track by obj.index" lazy-repeater="5" lazy-placeholder="templateUrl" lazy-if="true">{{obj.data}}</li></ul>')(initialScope);
+        $rootScope.$apply();
 
         el.find('placeholder').scope().increaseLimit();
 
         expect(triggerHandler).not.toHaveBeenCalled();
-        $rootScope.$apply();
-        $timeout.flush();
+        
+        $animate.flush();
 
         expect(triggerHandler).toHaveBeenCalled();
-
-        // After compiling the directive we should see all the 20 elements
-        expect(el.find('li').length).toBe(20);
-        // The placeholder doesn't exist
-        expect(el.find('placeholder').length).toBe(1);
-
     });
 
 })
