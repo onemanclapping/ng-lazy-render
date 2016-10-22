@@ -18,11 +18,9 @@ angular.module('ngLazyRender').directive('lazyModule', [
     '$compile',
     '$parse',
     '$q',
-    '$rootScope',
     '$templateCache',
-    '$timeout',
     'inViewDirective',
-    function ($animate, $compile, $parse, $q, $rootScope, $templateCache, $timeout, inViewDirective) {
+    function ($animate, $compile, $parse, $q, $templateCache, inViewDirective) {
         'use strict';
 
         return {
@@ -40,7 +38,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 }
 
                 var el = angular.element($templateCache.get($attr.lazyModule));
-                var isolateScope = $rootScope.$new();
+                var isolateScope = $scope.$new(true);
 
                 // Callback for inViewDirective to be called when the module becomes visible.
                 // This will destroy the scope of the placeholder with inView and replace it with

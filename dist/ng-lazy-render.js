@@ -13,9 +13,9 @@ angular.module('ngLazyRender', ['angular-inview']);
  *           take action or be ignored.
  *
  * Example:
- * <my-module lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
+ * <any lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
  *  <!-- lots of code -->
- * </my-module>
+ * </any>
  */
 angular.module('ngLazyRender').directive('lazyModule', [
     '$animate',
@@ -130,39 +130,56 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
-                    var bufferLength = $scope.$eval(bufferProp).length;
-                    var placeholder;
-                    var placeholderEl;
-                    var isolateScope;
-                    // Only apply lazyRepeater if the threshold is smaller then the number of items and if the
-                    // parameter lazy-if is true
-                    if (limit < bufferLength && $parse(attrs.lazyIf)($scope) !== false) {
-                        placeholder = attrs.lazyPlaceholder ?
-                                $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
-                        placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder +
-                            '</div>');
+                    var placeholderVisible = false;
 
-                        isolateScope = $rootScope.$new();
+                    function getBufferLength() {
+                        return $scope.$eval(bufferProp).length;
+                    }
+
+                    function addPlaceholder() {
+                        var placeholder = attrs.lazyPlaceholder ? $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
+                        var placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder + '</div>');
+                        var isolateScope = $scope.$new(true);
+
                         isolateScope.increaseLimit = function () {
-                            limit = Math.min(limit * 2, bufferLength);
-                            // This triggers inview until all the element in the viewport are visible
+                            var bufferLength = getBufferLength();
+
+                            limit *= 2;
+                            
+                            if (limit >= bufferLength) {
+                                isolateScope.$destroy();
+                                $animate.leave(placeholderEl);
+                                placeholderVisible = false;
+                            }
+
+                            // trigger in-view for other listeners
                             $timeout(function () {
                                 angular.element(window).triggerHandler('checkInView');
                             }, 0);
-                            if (limit === bufferLength) {
-                                $timeout(function () {
-                                    isolateScope.$destroy();
-                                    $animate.leave(placeholderEl);
-                                }, 0);
-                            }
                         };
 
-                        $animate.enter(placeholderEl, el.parent(), el);
+                        var elSiblings = el.parent().children();
+                        var elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1);
+
+                        $animate.enter(placeholderEl, el.parent(), elLastSibling);
                         $compile(placeholderEl)(isolateScope);
+                        placeholderVisible = true;
+                    }
+
+                    // Only apply lazyRepeater if the threshold is smaller then the number of items and if the
+                    // parameter lazy-if is true
+                    if (limit < getBufferLength() && $parse(attrs.lazyIf)($scope) !== false) {
+                        addPlaceholder();
 
                         $scope.getLazyLimit = function () {
                             return limit;
                         };
+
+                        $scope.$watch(getBufferLength, function (bufferLength) {
+                            if (limit < bufferLength && !placeholderVisible) {
+                                addPlaceholder();
+                            }
+                        });
                     }
                 };
             }

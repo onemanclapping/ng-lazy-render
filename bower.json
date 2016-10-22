@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "angular": "1.x",
-    "angular-inview": "1.5.7"
+    "angular-inview": "2.x"
   },
   "keywords": [
     "angular",
