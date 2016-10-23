@@ -22,11 +22,9 @@ angular.module('ngLazyRender').directive('lazyModule', [
     '$compile',
     '$parse',
     '$q',
-    '$rootScope',
     '$templateCache',
-    '$timeout',
     'inViewDirective',
-    function ($animate, $compile, $parse, $q, $rootScope, $templateCache, $timeout, inViewDirective) {
+    function ($animate, $compile, $parse, $q, $templateCache, inViewDirective) {
         'use strict';
 
         return {
@@ -44,7 +42,7 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 }
 
                 var el = angular.element($templateCache.get($attr.lazyModule));
-                var isolateScope = $rootScope.$new();
+                var isolateScope = $scope.$new(true);
 
                 // Callback for inViewDirective to be called when the module becomes visible.
                 // This will destroy the scope of the placeholder with inView and replace it with
@@ -106,10 +104,9 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
     '$animate',
     '$compile',
     '$parse',
-    '$rootScope',
     '$templateCache',
     '$timeout',
-    function ($animate, $compile, $parse, $rootScope, $templateCache, $timeout) {
+    function ($animate, $compile, $parse, $templateCache, $timeout) {
         'use strict';
 
         return {
@@ -151,17 +148,15 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                                 $animate.leave(placeholderEl);
                                 placeholderVisible = false;
                             }
-
-                            // trigger in-view for other listeners
-                            $timeout(function () {
-                                angular.element(window).triggerHandler('checkInView');
-                            }, 0);
                         };
 
                         var elSiblings = el.parent().children();
                         var elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1);
 
-                        $animate.enter(placeholderEl, el.parent(), elLastSibling);
+                        $animate.enter(placeholderEl, el.parent(), elLastSibling).then(function () {
+                            // trigger in-view for other listeners
+                            angular.element(window).triggerHandler('checkInView');
+                        });
                         $compile(placeholderEl)(isolateScope);
                         placeholderVisible = true;
                     }
