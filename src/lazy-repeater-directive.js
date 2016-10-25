@@ -44,6 +44,9 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
+                    var delay = parseInt(attrs.lazyDelay);
+                    var waiting = false;
+
                     var placeholderVisible = false;
 
                     function getBufferLength() {
@@ -55,7 +58,7 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                         var placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder + '</div>');
                         var isolateScope = $scope.$new(true);
 
-                        isolateScope.increaseLimit = function () {
+                        function increaseLimit() {
                             var bufferLength = getBufferLength();
 
                             limit *= 2;
@@ -64,6 +67,21 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
                                 isolateScope.$destroy();
                                 $animate.leave(placeholderEl);
                                 placeholderVisible = false;
+                            }
+
+                            waiting = false;
+                        }
+
+                        isolateScope.increaseLimit = function () {
+                            if (waiting) {
+                                return;
+                            }
+                            waiting = true;
+
+                            if (delay) {
+                                $timeout(increaseLimit, delay);
+                            } else {
+                                increaseLimit();
                             }
                         };
 
