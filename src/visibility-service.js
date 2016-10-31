@@ -1,7 +1,11 @@
-angular.module(`ngLazyRender`).service(`VisibilityService`, [
-  `$interval`,
-  `$q`,
-  function ($interval, $q) {
+angular.module(`ngLazyRender`).provider(`VisibilityService`, [function () {
+  let delay = 500
+
+  this.setDelay = function (newDelay) {
+    delay = newDelay
+  }
+
+  this.$get = [`$interval`, `$q`, function ($interval, $q) {
     let intervalPromise
     let watchingItems = []
     let idCounter = 0
@@ -45,13 +49,13 @@ angular.module(`ngLazyRender`).service(`VisibilityService`, [
       };
     }
 
-    this._startWatching = function () {
+    function _startWatching() {
       if (!intervalPromise) {
-        intervalPromise = $interval(this._checkInView, 500, 0, false)
+        intervalPromise = $interval(this._checkInView, delay, 0, false)
       }
     }
 
-    this._stopWatching = function () {
+    function _stopWatching() {
       if (intervalPromise) {
         $interval.cancel(intervalPromise)
         intervalPromise = null
@@ -59,7 +63,7 @@ angular.module(`ngLazyRender`).service(`VisibilityService`, [
     }
 
     // Code partially stolen from angular-inview. Thanks thenikso!
-    this._checkInView = function () {
+    function _checkInView() {
       const viewport = {
         top: 0,
         bottom: getViewportHeight()
@@ -79,7 +83,7 @@ angular.module(`ngLazyRender`).service(`VisibilityService`, [
       })
     }
 
-    this.whenVisible = function (element, scope, callback) {
+    function whenVisible(element, scope, callback) {
       const itemId = idCounter++
 
       watchingItems.push({
@@ -99,4 +103,12 @@ angular.module(`ngLazyRender`).service(`VisibilityService`, [
 
       this._startWatching()
     }
-  }])
+
+    return {
+      _startWatching,
+      _stopWatching,
+      _checkInView,
+      whenVisible
+    }
+  }]
+}])

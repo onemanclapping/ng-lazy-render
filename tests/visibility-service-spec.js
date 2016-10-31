@@ -6,8 +6,9 @@ describe('VisibilityService', () => {
 
 	beforeEach(() => {
 		module('ngLazyRender')
-		module(['$provide', ($provide) => {
+		module(['$provide', 'VisibilityServiceProvider', ($provide, VisibilityServiceProvider) => {
 			$provide.value('$interval', $intervalMock)
+			VisibilityServiceProvider.setDelay(450)
 		}])
 
 		inject([
@@ -24,6 +25,7 @@ describe('VisibilityService', () => {
 			expect($intervalMock).not.toHaveBeenCalled()
 			VisibilityService._startWatching()
 			expect($intervalMock.calls.count()).toBe(1)
+			expect($intervalMock.calls.argsFor(0)[1]).toBe(450)
 			VisibilityService._startWatching()
 			expect($intervalMock.calls.count()).toBe(1)
 		})
