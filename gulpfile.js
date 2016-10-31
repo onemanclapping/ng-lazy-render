@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var del = require('del');
 var Server = require('karma').Server;
+const babel = require('gulp-babel');
 
 var paths = {
   scripts: ['src/module.js', 'src/**/*.js']
@@ -14,6 +15,7 @@ gulp.task('clean', function() {
 gulp.task('scripts', ['clean'], function() {
   return gulp.src(paths.scripts)
     .pipe(concat('ng-lazy-render.js'))
+    .pipe(babel({presets: ['es2015']}))
     .pipe(gulp.dest('dist'));
 });
 
