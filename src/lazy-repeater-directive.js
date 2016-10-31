@@ -17,85 +17,81 @@
  *     </li>
  * </ul>
  */
-angular.module('ngLazyRender').directive('lazyRepeater', [
-    '$animate',
-    '$compile',
-    '$parse',
-    '$templateCache',
-    'VisibilityService',
-    function ($animate, $compile, $parse, $templateCache, VisibilityService) {
-        'use strict';
-
+angular.module(`ngLazyRender`).directive(`lazyRepeater`, [
+    `$animate`,
+    `$compile`,
+    `$parse`,
+    `$templateCache`,
+    `VisibilityService`,
+    ($animate, $compile, $parse, $templateCache, VisibilityService) => {
         return {
-            restrict: 'A',
+            restrict: `A`,
             priority: 2000,
-
-            compile: function (tElement, tAttrs) {
-                var trackByIndex = tAttrs.ngRepeat.indexOf('track by');
+            compile: (tElement, tAttrs) => {
+                const trackByIndex = tAttrs.ngRepeat.indexOf(`track by`)
 
                 if (trackByIndex === -1) {
-                    tAttrs.ngRepeat += "| limitTo: getLazyLimit()";
+                    tAttrs.ngRepeat += `| limitTo: getLazyLimit()`
                 } else {
-                    tAttrs.ngRepeat = tAttrs.ngRepeat.substr(0, trackByIndex) +
-                        "| limitTo: getLazyLimit() " + tAttrs.ngRepeat.substr(trackByIndex);
+                    tAttrs.ngRepeat =
+                        tAttrs.ngRepeat.substr(0, trackByIndex) +
+                        `| limitTo: getLazyLimit() ` +
+                        tAttrs.ngRepeat.substr(trackByIndex)
                 }
 
-                var bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1];
+                const bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1]
 
-                return function ($scope, el, attrs) {
-                    var limit = attrs.lazyRepeater;
-                    var placeholderVisible = false;
+                return ($scope, el, attrs) => {
+                    let limit = attrs.lazyRepeater
+                    let placeholderVisible = false
 
                     function getBufferLength() {
-                        return $scope.$eval(bufferProp).length;
+                        return $scope.$eval(bufferProp).length
                     }
 
                     function addPlaceholder() {
-                        var placeholder = attrs.lazyPlaceholder ? $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
-                        var placeholderEl = angular.element('<div>' + placeholder + '</div>');
-                        var isolateScope = $scope.$new(true);
+                        const placeholder = attrs.lazyPlaceholder ? $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : ``
+                        const placeholderEl = angular.element(`<div>${placeholder}</div>`)
+                        const isolateScope = $scope.$new(true)
 
                         function increaseLimit() {
-                            $scope.$apply(function () {
-                                var bufferLength = getBufferLength();
+                            $scope.$apply(() => {
+                                let bufferLength = getBufferLength()
 
-                                limit *= 2;
+                                limit *= 2
                                 
                                 if (limit >= bufferLength) {
-                                    isolateScope.$destroy();
-                                    $animate.leave(placeholderEl);
-                                    placeholderVisible = false;
+                                    isolateScope.$destroy()
+                                    $animate.leave(placeholderEl)
+                                    placeholderVisible = false
                                 }
-
                             })
                         }
 
-                        var elSiblings = el.parent().children();
-                        var elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1);
+                        const elSiblings = el.parent().children()
+                        const elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1)
 
-                        $animate.enter(placeholderEl, el.parent(), elLastSibling).then(function () {
-                            VisibilityService.whenVisible(placeholderEl, isolateScope, increaseLimit);
-                        });
-                        $compile(placeholderEl)(isolateScope);
-                        placeholderVisible = true;
+                        $animate.enter(placeholderEl, el.parent(), elLastSibling).then(() => {
+                            VisibilityService.whenVisible(placeholderEl, isolateScope, increaseLimit)
+                        })
+                        $compile(placeholderEl)(isolateScope)
+                        placeholderVisible = true
                     }
 
                     // Only apply lazyRepeater if the threshold is smaller then the number of items and if the
                     // parameter lazy-if is true
                     if (limit < getBufferLength() && $parse(attrs.lazyIf)($scope) !== false) {
-                        addPlaceholder();
+                        addPlaceholder()
 
-                        $scope.getLazyLimit = function () {
-                            return limit;
-                        };
+                        $scope.getLazyLimit = () => limit
 
-                        $scope.$watch(getBufferLength, function (bufferLength) {
+                        $scope.$watch(getBufferLength, (bufferLength) => {
                             if (limit < bufferLength && !placeholderVisible) {
-                                addPlaceholder();
+                                addPlaceholder()
                             }
-                        });
+                        })
                     }
-                };
+                }
             }
-        };
-    }]);
+        }
+    }])
