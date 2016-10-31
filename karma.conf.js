@@ -11,12 +11,19 @@ module.exports = function(config) {
       'tests/**/*.js'
     ],
     preprocessors: {
-      'src/**/*.js': 'coverage'
+      'src/**/*.js': ['coverage', 'babel'],
+      'test/**/*.js': ['babel']
     },
     reporters: ['coverage', 'spec'],
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['PhantomJS2']
+    browsers: ['PhantomJS2'],
+    babelPreprocessor: {
+      options: {
+        presets: ['es2015'],
+        sourceMap: 'inline'
+      }
+    }
   });
 };
