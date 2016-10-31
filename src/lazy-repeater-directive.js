@@ -54,7 +54,7 @@ angular.module(`ngLazyRender`).directive(`lazyRepeater`, [
                         const placeholderEl = angular.element(`<div>${placeholder}</div>`)
                         const isolateScope = $scope.$new(true)
 
-                        function increaseLimit() {
+                        isolateScope.increaseLimit = function() {
                             $scope.$apply(() => {
                                 let bufferLength = getBufferLength()
 
@@ -72,7 +72,7 @@ angular.module(`ngLazyRender`).directive(`lazyRepeater`, [
                         const elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1)
 
                         $animate.enter(placeholderEl, el.parent(), elLastSibling).then(() => {
-                            VisibilityService.whenVisible(placeholderEl, isolateScope, increaseLimit)
+                            VisibilityService.whenVisible(placeholderEl, isolateScope, isolateScope.increaseLimit)
                         })
                         $compile(placeholderEl)(isolateScope)
                         placeholderVisible = true
