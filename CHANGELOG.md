@@ -1,3 +1,11 @@
+# 1.1.0
+### Features
+$interval delay is now configurable.
+
+# 1.0.1
+### Breaking changes
+Removed angular-inview dependency. We're now polling for updates instead of reacting to scroll events. Looks better in most browsers.
+
 # 0.2.2
 ### Bug Fixes
 Fix magic numbers and hopefully fix weird scenarios where checkInView event was not trigerred correctly.
