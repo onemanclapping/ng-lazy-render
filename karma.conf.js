@@ -12,7 +12,7 @@ module.exports = function(config) {
     ],
     preprocessors: {
       'src/**/*.js': ['coverage', 'babel'],
-      'test/**/*.js': ['babel']
+      'tests/**/*.js': ['babel']
     },
     reporters: ['coverage', 'spec'],
     colors: true,
