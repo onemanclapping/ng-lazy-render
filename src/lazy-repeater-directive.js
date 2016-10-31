@@ -22,8 +22,8 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
     '$compile',
     '$parse',
     '$templateCache',
-    '$timeout',
-    function ($animate, $compile, $parse, $templateCache, $timeout) {
+    'VisibilityService',
+    function ($animate, $compile, $parse, $templateCache, VisibilityService) {
         'use strict';
 
         return {
@@ -44,9 +44,6 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                 return function ($scope, el, attrs) {
                     var limit = attrs.lazyRepeater;
-                    var delay = parseInt(attrs.lazyDelay);
-                    var waiting = false;
-
                     var placeholderVisible = false;
 
                     function getBufferLength() {
@@ -55,42 +52,29 @@ angular.module('ngLazyRender').directive('lazyRepeater', [
 
                     function addPlaceholder() {
                         var placeholder = attrs.lazyPlaceholder ? $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : '';
-                        var placeholderEl = angular.element('<div in-view="$inview && increaseLimit()">' + placeholder + '</div>');
+                        var placeholderEl = angular.element('<div>' + placeholder + '</div>');
                         var isolateScope = $scope.$new(true);
 
                         function increaseLimit() {
-                            var bufferLength = getBufferLength();
+                            $scope.$apply(function () {
+                                var bufferLength = getBufferLength();
 
-                            limit *= 2;
-                            
-                            if (limit >= bufferLength) {
-                                isolateScope.$destroy();
-                                $animate.leave(placeholderEl);
-                                placeholderVisible = false;
-                            }
+                                limit *= 2;
+                                
+                                if (limit >= bufferLength) {
+                                    isolateScope.$destroy();
+                                    $animate.leave(placeholderEl);
+                                    placeholderVisible = false;
+                                }
 
-                            waiting = false;
+                            })
                         }
-
-                        isolateScope.increaseLimit = function () {
-                            if (waiting) {
-                                return;
-                            }
-                            waiting = true;
-
-                            if (delay) {
-                                $timeout(increaseLimit, delay);
-                            } else {
-                                increaseLimit();
-                            }
-                        };
 
                         var elSiblings = el.parent().children();
                         var elLastSibling = elSiblings.length === 0 ? el : elSiblings.eq(-1);
 
                         $animate.enter(placeholderEl, el.parent(), elLastSibling).then(function () {
-                            // trigger in-view for other listeners
-                            angular.element(window).triggerHandler('checkInView');
+                            VisibilityService.whenVisible(placeholderEl, isolateScope, increaseLimit);
                         });
                         $compile(placeholderEl)(isolateScope);
                         placeholderVisible = true;
