@@ -1,10 +1,10 @@
-angular.module('ngLazyRender').service('VisibilityService', [
-  '$interval',
-  '$q',
-  function ($interval, $q) {
-    var intervalPromise
-    var watchingItems = []
-    var idCounter = 0
+angular.module(`ngLazyRender`).service(`VisibilityService`, [
+  `$interval`,
+  `$q`,
+  ($interval, $q) => {
+    let intervalPromise
+    let watchingItems = []
+    let idCounter = 0
 
     // Code fully stolen from angular-inview. Thanks thenikso!
     function getViewportHeight() {
@@ -60,28 +60,27 @@ angular.module('ngLazyRender').service('VisibilityService', [
 
     // Code partially stolen from angular-inview. Thanks thenikso!
     this._checkInView = function () {
-      var viewport = {
+      const viewport = {
         top: 0,
         bottom: getViewportHeight()
       }
-      var callbacks = []
+      const callbacks = []
 
-      watchingItems.forEach(function (item) {
-        var bounds = getBoundingClientRect(item.element[0])
+      watchingItems.forEach((item) => {
+        const bounds = getBoundingClientRect(item.element[0])
 
         if (bounds.top < viewport.bottom && bounds.bottom >= viewport.top) {
           callbacks.push(item.callback)
         }
       })
 
-      callbacks.forEach(function (callback) {
+      callbacks.forEach((callback) => {
         callback()
       })
     }
 
     this.whenVisible = function (element, scope, callback) {
-      var deferred = $q.defer()
-      var itemId = idCounter++
+      const itemId = idCounter++
 
       watchingItems.push({
         element: element,
@@ -90,20 +89,14 @@ angular.module('ngLazyRender').service('VisibilityService', [
         id: itemId
       })
 
-      scope.$on('$destroy', function () {
-        watchingItems = watchingItems.filter(function (item) {
-          if (item.id === itemId) {
-            return false
-          }
-          return true
-        })
+      scope.$on(`$destroy`, () => {
+        watchingItems = watchingItems.filter((item) => item.id !== itemId)
 
         if (watchingItems.length === 0) {
           this._stopWatching()
         }
-      }.bind(this))
+      })
 
       this._startWatching()
-      return deferred.promise
     }
-  }]);
+  }])
