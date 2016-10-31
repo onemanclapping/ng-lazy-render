@@ -8,8 +8,7 @@
     "url": "git://github.com/onemanclapping/ng-lazy-render.git"
   },
   "dependencies": {
-    "angular": "1.x",
-    "angular-inview": "1.x"
+    "angular": "1.x"
   },
   "keywords": [
     "angular",
