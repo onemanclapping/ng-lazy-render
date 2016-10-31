@@ -26,7 +26,7 @@ describe(`lazyRepeater directive`, () => {
         var initialScope = $rootScope.$new()
         initialScope.data = []
 
-        for (var i = 0 i < 30 i += 1) {
+        for (let i = 0; i < 30; i += 1) {
             initialScope.data.push({
                 index: i,
                 data: `such data`
@@ -66,7 +66,7 @@ describe(`lazyRepeater directive`, () => {
         var initialScope = $rootScope.$new()
         initialScope.data = []
 
-        for (var i = 0 i < 8 i += 1) {
+        for (var i = 0; i < 8; i += 1) {
             initialScope.data.push({
                 index: i,
                 data: `such data`
@@ -89,7 +89,7 @@ describe(`lazyRepeater directive`, () => {
         var initialScope = $rootScope.$new()
         initialScope.data = []
 
-        for (var i = 0 i < 10 i += 1) {
+        for (var i = 0; i < 10; i += 1) {
             initialScope.data.push({
                 index: i,
                 data: `such data`
@@ -112,7 +112,7 @@ describe(`lazyRepeater directive`, () => {
         var initialScope = $rootScope.$new()
         initialScope.data = []
 
-        for (var i = 0 i < 30 i += 1) {
+        for (var i = 0; i < 30; i += 1) {
             initialScope.data.push({
                 index: i,
                 data: `such data`
