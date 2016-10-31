@@ -13,21 +13,21 @@
  *  <!-- lots of code -->
  * </any>
  */
-angular.module('ngLazyRender').directive('lazyModule', [
-    '$animate',
-    '$compile',
-    '$parse',
-    '$q',
-    '$templateCache',
-    'inViewDirective',
-    function ($animate, $compile, $parse, $q, $templateCache, inViewDirective) {
-        'use strict';
+angular.module(`ngLazyRender`).directive(`lazyModule`, [
+    `$animate`,
+    `$compile`,
+    `$parse`,
+    `$q`,
+    `$templateCache`,
+    `VisibilityService`,
+    function ($animate, $compile, $parse, $q, $templateCache, VisibilityService) {
+        `use strict`;
 
         return {
             // 500 because is less than ngIf and ngRepeat
             priority: 500,
             terminal: true,
-            transclude: 'element',
+            transclude: `element`,
             link: function ($scope, $element, $attr, ctrl, $transclude) {
                 // If the expression in lazyIf is false, skip the directive's action
                 if ($parse($attr.lazyIf)($scope) === false) {
@@ -40,17 +40,16 @@ angular.module('ngLazyRender').directive('lazyModule', [
                 var el = angular.element($templateCache.get($attr.lazyModule));
                 var isolateScope = $scope.$new(true);
 
-                // Callback for inViewDirective to be called when the module becomes visible.
-                // This will destroy the scope of the placeholder with inView and replace it with
+                // Callback for VisibilityService to be called when the module becomes visible.
+                // This will destroy the scope of the placeholder and replace it with
                 // the actual transcluded content.
-                isolateScope.update = function () {
+                isolateScope.showModule = function () {
                     // If the function is called after the scope is destroyed (more than once),
                     // we should do nothing.
                     if (isolateScope === null) {
                         return;
                     }
-                    // It is important to destroy the old scope or we'll get unwanted calls from
-                    // the inView directive.
+                    // It is important to destroy the old scope or we'll never kill VisibilityService
                     isolateScope.$destroy();
                     isolateScope = null;
 
@@ -60,18 +59,13 @@ angular.module('ngLazyRender').directive('lazyModule', [
 
                         $q.all([enterPromise, leavePromise]).then(function () {
                             el = null;
-
-                            // This triggers inview again to make sure everything is checked again
-                            angular.element(window).triggerHandler('checkInView');
                         });
                     });
                 };
 
                 $animate.enter(el, $element.parent(), $element).then(function () {
                     $compile(el)(isolateScope);
-                    inViewDirective[0].compile()(isolateScope, el, {
-                        inView: "$inview && update()"
-                    });
+                    VisibilityService.whenVisible(el, isolateScope, isolateScope.showModule)
                 });
             }
         };
