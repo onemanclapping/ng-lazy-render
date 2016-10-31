@@ -3,7 +3,7 @@
 /**
  * Module declaration
  */
-angular.module('ngLazyRender', ['angular-inview']);
+angular.module('ngLazyRender', []);
 /**
  * Use this directive as an attribute if you want to delay the rendering of a module until visible
  * in the viewport.

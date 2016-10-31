@@ -1,4 +1,4 @@
 /**
  * Module declaration
  */
-angular.module('ngLazyRender', ['angular-inview']);
+angular.module('ngLazyRender', []);
