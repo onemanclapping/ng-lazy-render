@@ -1,7 +1,7 @@
 angular.module(`ngLazyRender`).service(`VisibilityService`, [
   `$interval`,
   `$q`,
-  ($interval, $q) => {
+  function ($interval, $q) {
     let intervalPromise
     let watchingItems = []
     let idCounter = 0
