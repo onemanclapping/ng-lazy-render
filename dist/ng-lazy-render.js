@@ -48,16 +48,19 @@ angular.module('ngLazyRender').directive('lazyModule', ['$animate', '$compile', 
                 if (isolateScope === null) {
                     return;
                 }
-                // It is important to destroy the old scope or we'll never kill VisibilityService
-                isolateScope.$destroy();
-                isolateScope = null;
 
-                $transclude(function (clone) {
-                    var enterPromise = $animate.enter(clone, $element.parent(), $element);
-                    var leavePromise = $animate.leave(el);
+                $scope.$apply(function () {
+                    // It is important to destroy the old scope or we'll never kill VisibilityService
+                    isolateScope.$destroy();
+                    isolateScope = null;
 
-                    $q.all([enterPromise, leavePromise]).then(function () {
-                        el = null;
+                    $transclude(function (clone) {
+                        var enterPromise = $animate.enter(clone, $element.parent(), $element);
+                        var leavePromise = $animate.leave(el);
+
+                        $q.all([enterPromise, leavePromise]).then(function () {
+                            el = null;
+                        });
                     });
                 });
             };
