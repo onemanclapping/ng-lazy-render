@@ -1,4 +1,4 @@
-# 1.1.0
+# 1.1.3
 ### Bug Fixes
 lazy-module directive was not working.
 
