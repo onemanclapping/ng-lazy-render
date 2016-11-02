@@ -1,4 +1,8 @@
 # 1.1.0
+### Bug Fixes
+lazy-module directive was not working.
+
+# 1.1.0
 ### Features
 $interval delay is now configurable.
 
