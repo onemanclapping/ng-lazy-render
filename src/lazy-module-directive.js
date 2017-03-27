@@ -50,7 +50,7 @@ angular.module(`ngLazyRender`).directive(`lazyModule`, [
                         return
                     }
 
-                    $scope.$apply(() => {
+                    $scope.$applyAsync(() => {
                         // It is important to destroy the old scope or we'll never kill VisibilityService
                         isolateScope.$destroy()
                         isolateScope = null
