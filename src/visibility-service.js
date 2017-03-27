@@ -2,7 +2,7 @@ angular.module(`ngLazyRender`).provider(`VisibilityService`, [function () {
   let delay = 500
 
   this.setDelay = function (newDelay) {
-    delay = newDelay
+    delay = newDelay;
   }
 
   this.$get = [`$interval`, `$q`, function ($interval, $q) {
@@ -50,8 +50,8 @@ angular.module(`ngLazyRender`).provider(`VisibilityService`, [function () {
     }
 
     function _startWatching() {
-      if (!intervalPromise) {
-        intervalPromise = $interval(this._checkInView, delay, 0, false)
+      if (!intervalPromise && delay) {
+        intervalPromise = $interval(this.checkInView, delay, 0, false)
       }
     }
 
@@ -63,7 +63,7 @@ angular.module(`ngLazyRender`).provider(`VisibilityService`, [function () {
     }
 
     // Code partially stolen from angular-inview. Thanks thenikso!
-    function _checkInView() {
+    function checkInView() {
       const viewport = {
         top: 0,
         bottom: getViewportHeight()
@@ -107,7 +107,7 @@ angular.module(`ngLazyRender`).provider(`VisibilityService`, [function () {
     return {
       _startWatching,
       _stopWatching,
-      _checkInView,
+      checkInView,
       whenVisible
     }
   }]
