@@ -48,6 +48,7 @@ describe(`lazyModule directive`, () => {
         // When the placeholder becomes visible, its update function is called.
         // Let us pretend it happened!
         lazyScope.showModule()
+        $rootScope.$digest()
 
         // Now the placeholder should not be visible anymore
         expect(el.find(`placeholder`).length).toBe(0)

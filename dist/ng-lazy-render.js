@@ -43,13 +43,13 @@ angular.module('ngLazyRender').directive('lazyModule', ['$animate', '$compile', 
             // This will destroy the scope of the placeholder and replace it with
             // the actual transcluded content.
             isolateScope.showModule = function () {
-                // If the function is called after the scope is destroyed (more than once),
-                // we should do nothing.
-                if (isolateScope === null) {
-                    return;
-                }
+                $scope.$applyAsync(function () {
+                    // If the function is called after the scope is destroyed (more than once),
+                    // we should do nothing.
+                    if (isolateScope === null) {
+                        return;
+                    }
 
-                $scope.$apply(function () {
                     // It is important to destroy the old scope or we'll never kill VisibilityService
                     isolateScope.$destroy();
                     isolateScope = null;
@@ -216,8 +216,8 @@ angular.module('ngLazyRender').provider('VisibilityService', [function () {
         }
 
         function _startWatching() {
-            if (!intervalPromise) {
-                intervalPromise = $interval(this._checkInView, delay, 0, false);
+            if (!intervalPromise && delay) {
+                intervalPromise = $interval(this.checkInView, delay, 0, false);
             }
         }
 
@@ -229,7 +229,7 @@ angular.module('ngLazyRender').provider('VisibilityService', [function () {
         }
 
         // Code partially stolen from angular-inview. Thanks thenikso!
-        function _checkInView() {
+        function checkInView() {
             var viewport = {
                 top: 0,
                 bottom: getViewportHeight()
@@ -277,7 +277,7 @@ angular.module('ngLazyRender').provider('VisibilityService', [function () {
         return {
             _startWatching: _startWatching,
             _stopWatching: _stopWatching,
-            _checkInView: _checkInView,
+            checkInView: checkInView,
             whenVisible: whenVisible
         };
     }];

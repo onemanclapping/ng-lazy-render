@@ -2,12 +2,13 @@ describe('VisibilityService', () => {
 	const $intervalMock = jasmine.createSpy('$interval').and.returnValue({})
 	$intervalMock.cancel = jasmine.createSpy('$intervalCancel').and.stub()
 
-	let $rootScope, VisibilityService
+	let $rootScope, VisibilityService, VisibilityServiceProvider
 
 	beforeEach(() => {
 		module('ngLazyRender')
-		module(['$provide', 'VisibilityServiceProvider', ($provide, VisibilityServiceProvider) => {
+		module(['$provide', 'VisibilityServiceProvider', ($provide, _VisibilityServiceProvider_) => {
 			$provide.value('$interval', $intervalMock)
+			VisibilityServiceProvider = _VisibilityServiceProvider_
 			VisibilityServiceProvider.setDelay(450)
 		}])
 
@@ -28,6 +29,20 @@ describe('VisibilityService', () => {
 			expect($intervalMock.calls.argsFor(0)[1]).toBe(450)
 			VisibilityService._startWatching()
 			expect($intervalMock.calls.count()).toBe(1)
+		})
+
+		describe('if delay is disabled', () => {
+			beforeEach(() => {
+				$intervalMock.calls.reset()
+				VisibilityServiceProvider.setDelay(false)
+				inject();
+			})
+
+			it('should not call $interval', () => {
+				expect($intervalMock).not.toHaveBeenCalled()
+				VisibilityService._startWatching()
+				expect($intervalMock).not.toHaveBeenCalled()
+			})
 		})
 	})
 
