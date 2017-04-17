@@ -66,4 +66,27 @@ describe(`lazyModule directive`, () => {
         // After compiling the directive we should no longer be able to see the content
         expect(el.find(`module`).length).not.toBe(0)
     })
+
+    it('should show the placeholder only when we tell it to', function () {
+        $templateCache.put('templateUrl', '<placeholder></placeholder>')
+        $rootScope.hidePlaceholder = false
+
+        var initialScope = $rootScope.$new()
+        var el = $compile('<div><module lazy-module="templateUrl" lazy-hide="hidePlaceholder"></module></div>')(initialScope)
+
+        // After compiling the directive we should no longer be able to see the content
+        expect(el.find('module').length).toBe(0)
+
+        // Also, we should now see the placeholder (article) and it should have its own scope
+        var lazyScope = el.find('placeholder').scope()
+        expect(lazyScope).not.toBe(initialScope)
+
+        $rootScope.hidePlaceholder = true
+        initialScope.$digest()
+        // Now the placeholder should not be visible anymore
+        expect(el.find('placeholder').length).toBe(0)
+
+        // And the module should be visible again
+        expect(el.find('module').length).not.toBe(0)
+    })
 })

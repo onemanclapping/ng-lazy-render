@@ -11,10 +11,18 @@ Attributes:
 
 - lazyIf: use an angular expression here to set a condition on whether you want this directive to take action or be ignored.
 
-Example:
+- lazyHide: (optional) an angular expression to only hide the placeholder. With this parameter, this directive ignores the visibility of the module and only hides the placeholder when told to
+
+Examples:
 
 ```html
 <any lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad">
+    <!-- lots of code -->
+</any>
+```
+
+```html
+<any lazy-module="myModulePlaceholder.html" lazy-if="ctrl.acceleratePageLoad" lazy-hide="ctrl.hidePlaceholder">
     <!-- lots of code -->
 </any>
 ```
