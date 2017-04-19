@@ -1,3 +1,7 @@
+# 1.2.0
+### Features
+lazy-hide parameter on lazy-module directive
+
 # 1.1.3
 ### Bug Fixes
 lazy-module directive was not working.

@@ -20,8 +20,33 @@ angular.module(`ngLazyRender`).directive(`lazyModule`, [
     `$q`,
     `$templateCache`,
     `VisibilityService`,
-    function ($animate, $compile, $parse, $q, $templateCache, VisibilityService) {
+    ($animate, $compile, $parse, $q, $templateCache, VisibilityService) => {
         `use strict`
+
+        const removePlaceholder = ($transclude, scope, placeholderElem, moduleElem, finallyCb) => {
+            // If the function is called after the scope is destroyed (more than once),
+            // we should do nothing.
+            if (scope === null) {
+                return
+            }
+
+            // It is important to destroy the old scope or we'll never kill VisibilityService
+            scope.$destroy()
+            scope = null
+
+            $transclude((clone) => {
+                const enterPromise = $animate.enter(clone, moduleElem.parent(), moduleElem)
+                const leavePromise = $animate.leave(placeholderElem)
+
+                var promise = $q.all([enterPromise, leavePromise]).then(() => {
+                    placeholderElem = null
+                })
+
+                if (finallyCb) {
+                    promise.finally(finallyCb)
+                }
+            })
+        }
 
         return {
             // 500 because is less than ngIf and ngRepeat
@@ -31,45 +56,37 @@ angular.module(`ngLazyRender`).directive(`lazyModule`, [
             link: function ($scope, $element, $attr, ctrl, $transclude) {
                 // If the expression in lazyIf is false, skip the directive's action
                 if ($parse($attr.lazyIf)($scope) === false) {
-                    $transclude(function (clone) {
+                    $transclude((clone) => {
                         $animate.enter(clone, $element.parent(), $element)
                     })
                     return
                 }
 
-                var el = angular.element($templateCache.get($attr.lazyModule))
-                var isolateScope = $scope.$new(true)
+                const el = angular.element($templateCache.get($attr.lazyModule))
+                const isolateScope = $scope.$new(true)
+                let watcher;
 
-                // Callback for VisibilityService to be called when the module becomes visible.
-                // This will destroy the scope of the placeholder and replace it with
-                // the actual transcluded content.
-                isolateScope.showModule = function () {
-                    $scope.$applyAsync(() => {
-                        // If the function is called after the scope is destroyed (more than once),
-                        // we should do nothing.
-                        if (isolateScope === null) {
-                            return
+                if ($attr.lazyHide) {
+                    watcher = $scope.$watch($attr.lazyHide, (value) => {
+                        if (!!value) {
+                            removePlaceholder($transclude, isolateScope, el, $element, watcher)
                         }
-
-                        // It is important to destroy the old scope or we'll never kill VisibilityService
-                        isolateScope.$destroy()
-                        isolateScope = null
-
-                        $transclude(function (clone) {
-                            var enterPromise = $animate.enter(clone, $element.parent(), $element)
-                            var leavePromise = $animate.leave(el)
-
-                            $q.all([enterPromise, leavePromise]).then(function () {
-                                el = null
-                            })
+                    })
+                } else {
+                    // Callback for VisibilityService to be called when the module becomes visible.
+                    // This will destroy the scope of the placeholder and replace it with
+                    // the actual transcluded content.
+                    isolateScope.showModule = () => {
+                        $scope.$applyAsync(() => {
+                            removePlaceholder($transclude, isolateScope, el, $element)
                         })
+                    }
+
+                    $animate.enter(el, $element.parent(), $element).then(() => {
+                        $compile(el)(isolateScope)
+                        VisibilityService.whenVisible(el, isolateScope, isolateScope.showModule)
                     })
                 }
-
-                $animate.enter(el, $element.parent(), $element).then(function () {
-                    $compile(el)(isolateScope)
-                    VisibilityService.whenVisible(el, isolateScope, isolateScope.showModule)
-                })
             }
         }
     }])
