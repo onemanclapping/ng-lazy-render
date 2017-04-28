@@ -1,3 +1,7 @@
+# 1.2.1
+### Bug Fixes
+placeholders were not correctly loading with lazy-hide parameter on lazy-module directive
+
 # 1.2.0
 ### Features
 lazy-hide parameter on lazy-module directive
