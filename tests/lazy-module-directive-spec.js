@@ -76,10 +76,8 @@ describe(`lazyModule directive`, () => {
 
         // After compiling the directive we should no longer be able to see the content
         expect(el.find('module').length).toBe(0)
-
-        // Also, we should now see the placeholder (article) and it should have its own scope
-        var lazyScope = el.find('placeholder').scope()
-        expect(lazyScope).not.toBe(initialScope)
+        // the placeholder should be visible
+        expect(el.find('placeholder').length).toBe(1)
 
         $rootScope.hidePlaceholder = true
         initialScope.$digest()
@@ -87,6 +85,6 @@ describe(`lazyModule directive`, () => {
         expect(el.find('placeholder').length).toBe(0)
 
         // And the module should be visible again
-        expect(el.find('module').length).not.toBe(0)
+        expect(el.find('module').length).toBe(1)
     })
 })

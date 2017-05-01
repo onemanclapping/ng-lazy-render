@@ -22,7 +22,7 @@ angular.module('ngLazyRender', []);
 angular.module('ngLazyRender').directive('lazyModule', ['$animate', '$compile', '$parse', '$q', '$templateCache', 'VisibilityService', function ($animate, $compile, $parse, $q, $templateCache, VisibilityService) {
     'use strict';
 
-    var hidePlaceholder = function hidePlaceholder($transclude, scope, placeholderElem, moduleElem, finallyCb) {
+    var removePlaceholder = function removePlaceholder($transclude, scope, placeholderElem, moduleElem, finallyCb) {
         // If the function is called after the scope is destroyed (more than once),
         // we should do nothing.
         if (scope === null) {
@@ -66,9 +66,15 @@ angular.module('ngLazyRender').directive('lazyModule', ['$animate', '$compile', 
             var watcher = void 0;
 
             if ($attr.lazyHide) {
+                //load the placeholder
+                $animate.enter(el, $element.parent(), $element).then(function () {
+                    $compile(el)(isolateScope);
+                });
+
+                //watch lazyHide attribute, when true remove the placeholder, show the module and remove the watch
                 watcher = $scope.$watch($attr.lazyHide, function (value) {
                     if (!!value) {
-                        hidePlaceholder($transclude, isolateScope, el, $element, watcher);
+                        removePlaceholder($transclude, isolateScope, el, $element, watcher);
                     }
                 });
             } else {
@@ -77,7 +83,7 @@ angular.module('ngLazyRender').directive('lazyModule', ['$animate', '$compile', 
                 // the actual transcluded content.
                 isolateScope.showModule = function () {
                     $scope.$applyAsync(function () {
-                        hidePlaceholder($transclude, isolateScope, el, $element);
+                        removePlaceholder($transclude, isolateScope, el, $element);
                     });
                 };
 

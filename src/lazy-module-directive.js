@@ -67,6 +67,12 @@ angular.module(`ngLazyRender`).directive(`lazyModule`, [
                 let watcher;
 
                 if ($attr.lazyHide) {
+                    //load the placeholder
+                    $animate.enter(el, $element.parent(), $element).then(() => {
+                        $compile(el)(isolateScope)
+                    })
+
+                    //watch lazyHide attribute, when true remove the placeholder, show the module and remove the watch
                     watcher = $scope.$watch($attr.lazyHide, (value) => {
                         if (!!value) {
                             removePlaceholder($transclude, isolateScope, el, $element, watcher)
