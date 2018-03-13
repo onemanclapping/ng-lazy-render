@@ -42,7 +42,7 @@ angular.module(`ngLazyRender`).directive(`lazyRepeater`, [
                 const bufferProp = tAttrs.ngRepeat.match(/in (.*?)?([ |\n|]|$)/)[1]
 
                 return ($scope, el, attrs) => {
-                    let limit = attrs.lazyRepeater
+	                let limit = $parse(attrs.lazyRepeater)($scope)
                     let placeholderVisible = false
 
                     function getBufferLength() {
@@ -50,7 +50,19 @@ angular.module(`ngLazyRender`).directive(`lazyRepeater`, [
                     }
 
                     function addPlaceholder() {
-                        const placeholder = attrs.lazyPlaceholder ? $templateCache.get(attrs.lazyPlaceholder) || attrs.lazyPlaceholder : ``
+	                    let placeholder = ``;
+	                    if(attrs.lazyPlaceholder) {
+		                    if($templateCache.get(attrs.lazyPlaceholder)) {
+			                    placeholder = $templateCache.get(attrs.lazyPlaceholder);
+		                    }
+		
+		                    try {
+			                    placeholder = $parse(attrs.lazyPlaceholder)($scope);
+		                    } catch (e) {
+			                    //I dont like this empty catch, but its the only way of catching parse error
+		                    }
+	                    }
+	                    
                         const placeholderEl = angular.element(`<div>${placeholder}</div>`)
                         const isolateScope = $scope.$new(true)
 
